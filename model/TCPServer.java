@@ -46,17 +46,37 @@ public class TCPServer extends Server {
   }
 
   private void handleClient(Socket clientSocket) throws IOException, ClassNotFoundException {
-    ObjectInputStream input = new ObjectInputStream(clientSocket.getInputStream());
-    String data = (String) input.readObject();
-    ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-    clientOutputStreams.add(outputStream);
+    ObjectInputStream input = null;
+    ObjectOutputStream outputStream = null;
     try {
-      readMessage(data);
-    } catch (Exception e) {
-      System.out.println("> Erro: Não foi possível ler a mensagem");
+      input = new ObjectInputStream(clientSocket.getInputStream());
+      String data = (String) input.readObject();
+      outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+      clientOutputStreams.add(outputStream);
+      try {
+        readMessage(data);
+      } catch (Exception e) {
+        System.out.println("> Erro: Não foi possível ler a mensagem");
+      }
+    } catch (IOException | ClassNotFoundException e) {
+      System.out.println("> Erro ao lidar com o cliente: " + e.getMessage());
     } finally {
-      outputStream.close();
-      input.close();
+      // Fecha os fluxos de entrada e saída
+      if (input != null) {
+        try {
+          input.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+      if (outputStream != null) {
+        try {
+          outputStream.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+      // Remove o fluxo de saída associado ao cliente desconectado da lista
       clientOutputStreams.remove(outputStream);
     }
   }

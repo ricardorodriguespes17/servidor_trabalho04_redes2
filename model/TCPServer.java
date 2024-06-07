@@ -2,10 +2,14 @@ package model;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TCPServer extends Server {
+  private List<ObjectOutputStream> clientOutputStreams = new ArrayList<>();
   private ServerSocket serverSocket;
 
   public TCPServer(int port) {
@@ -44,6 +48,8 @@ public class TCPServer extends Server {
   private void handleClient(Socket clientSocket) throws IOException, ClassNotFoundException {
     ObjectInputStream input = new ObjectInputStream(clientSocket.getInputStream());
     String data = (String) input.readObject();
+    ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+    clientOutputStreams.add(outputStream);
     try {
       readMessage(data);
     } catch (Exception e) {
@@ -72,4 +78,15 @@ public class TCPServer extends Server {
     }
   }
 
+  @Override
+  public void sendMessageToAllClients(String message) {
+    for (ObjectOutputStream outputStream : clientOutputStreams) {
+      try {
+        outputStream.writeObject(message);
+        outputStream.flush();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
 }

@@ -18,6 +18,8 @@ public abstract class Server {
 
   public abstract void start();
 
+  public abstract void sendMessageToAllClients(String message);
+
   public abstract void stop();
 
   public int getPort() {

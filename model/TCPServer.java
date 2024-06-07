@@ -1,6 +1,8 @@
 package model;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -24,11 +26,11 @@ public class TCPServer extends Server {
 
       while (true) {
         Socket clientSocket = serverSocket.accept();
-        handleClient(clientSocket);
+        new Thread(() -> {
+          handleClient(clientSocket);
+        }).start();
       }
     } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
   }
@@ -45,7 +47,7 @@ public class TCPServer extends Server {
     }
   }
 
-  private void handleClient(Socket clientSocket) throws IOException, ClassNotFoundException {
+  private void handleClient(Socket clientSocket) {
     ObjectInputStream input = null;
     ObjectOutputStream outputStream = null;
     try {

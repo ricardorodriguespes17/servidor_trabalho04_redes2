@@ -70,8 +70,10 @@ public class TCPServer extends Server {
           message += dataSplited[i] + " ";
         }
         message = message.trim();
-        System.out.println("> " + user + " diz: '" + message + "' para " + groupId);
-        sendMessageToAllClients(message);
+
+        String completedMessage = "> " + user + " diz: '" + message + "' para " + groupId;
+        System.out.println(completedMessage);
+        sendMessageToAllClients(completedMessage);
         break;
       default:
         System.out.println("> Tipo de mensagem inválida");

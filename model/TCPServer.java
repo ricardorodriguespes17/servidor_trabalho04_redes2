@@ -58,6 +58,7 @@ public class TCPServer extends Server {
           readMessage(data);
         } catch (Exception e) {
           System.out.println("> Erro: Classe não encontrada ao ler mensagem");
+          break;
         }
       }
     } catch (IOException e) {

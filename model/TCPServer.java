@@ -55,7 +55,7 @@ public class TCPServer extends Server {
       while (true) {
         try {
           String data = (String) input.readObject();
-          readMessage(data);
+          readMessage(outputStream, data);
         } catch (Exception e) {
           System.out.println("> Erro: Classe não encontrada ao ler mensagem");
           break;
@@ -84,7 +84,7 @@ public class TCPServer extends Server {
     }
   }
 
-  private void readMessage(String data) throws Exception {
+  private void readMessage(ObjectOutputStream sender, String data) throws Exception {
     String[] dataSplited = data.split("/");
     String type = dataSplited[0];
     String groupId = dataSplited[1];
@@ -100,7 +100,7 @@ public class TCPServer extends Server {
 
         String completedMessage = "> " + user + " diz: '" + message + "' para " + groupId;
         System.out.println(completedMessage);
-        sendMessageToAllClients(completedMessage);
+        sendMessageToAllClients(sender, completedMessage);
         break;
       default:
         System.out.println("> Tipo de mensagem inválida");
@@ -110,14 +110,15 @@ public class TCPServer extends Server {
   }
 
   @Override
-  public void sendMessageToAllClients(String message) {
+  public void sendMessageToAllClients(ObjectOutputStream sender, String message) {
     for (ObjectOutputStream outputStream : clientOutputStreams) {
-      try {
-        System.out.println(outputStream);
-        outputStream.writeObject(message);
-        outputStream.flush();
-      } catch (IOException e) {
-        e.printStackTrace();
+      if (!outputStream.equals(sender)) {
+        try {
+          outputStream.writeObject(message);
+          outputStream.flush();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
       }
     }
   }

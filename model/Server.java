@@ -1,5 +1,7 @@
 package model;
 
+import java.io.ObjectOutputStream;
+
 public abstract class Server {
   protected int port;
 
@@ -18,7 +20,7 @@ public abstract class Server {
 
   public abstract void start();
 
-  public abstract void sendMessageToAllClients(String message);
+  public abstract void sendMessageToAllClients(ObjectOutputStream sender, String message);
 
   public abstract void stop();
 

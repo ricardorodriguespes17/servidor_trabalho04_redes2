@@ -13,6 +13,6 @@ public class Principal {
   public static void main(String[] args) {
     Server tcpServer = Server.createServer("TCP", 6789);
 
-    // new Thread(tcpServer::start).start();
+    new Thread(tcpServer::start).start();
   }
 }

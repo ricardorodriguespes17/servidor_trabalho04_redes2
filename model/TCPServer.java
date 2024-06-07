@@ -3,6 +3,7 @@ package model;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -26,6 +27,8 @@ public class TCPServer extends Server {
       }
     } catch (IOException e) {
       e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
     }
   }
 
@@ -41,24 +44,9 @@ public class TCPServer extends Server {
     }
   }
 
-  private void handleClient(Socket clientSocket) {
-    try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
-
-      String clientInput;
-      while ((clientInput = in.readLine()) != null) {
-        System.out.println("Received: " + clientInput);
-        out.println("Echo: " + clientInput);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        clientSocket.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
+  private void handleClient(Socket clientSocket) throws IOException, ClassNotFoundException {
+    ObjectInputStream input = new ObjectInputStream(clientSocket.getInputStream());
+    System.out.println((String) input.readObject());
   }
 
 }

@@ -71,11 +71,13 @@ public class TCPServer extends Server {
         }
         message = message.trim();
         System.out.println("> " + user + " diz: '" + message + "' para " + groupId);
+        sendMessageToAllClients(message);
         break;
       default:
         System.out.println("> Tipo de mensagem inválida");
         break;
     }
+
   }
 
   @Override

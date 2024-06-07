@@ -64,7 +64,7 @@ public class TCPServer extends Server {
     switch (type) {
       case "send":
         String message = contentSplited[2];
-        System.out.println("> " + user + " diz: " + message + " para " + groupId);
+        System.out.println("> " + user + " diz: '" + message + "' para " + groupId);
         break;
       default:
         System.out.println("> Tipo de mensagem inválida");

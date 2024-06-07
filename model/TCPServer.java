@@ -34,7 +34,7 @@ public class TCPServer extends Server {
     try {
       if (serverSocket != null && !serverSocket.isClosed()) {
         serverSocket.close();
-        System.out.println("TCP Server encerrado.");
+        System.out.println("> TCP Server encerrado.");
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -43,7 +43,33 @@ public class TCPServer extends Server {
 
   private void handleClient(Socket clientSocket) throws IOException, ClassNotFoundException {
     ObjectInputStream input = new ObjectInputStream(clientSocket.getInputStream());
-    System.out.println((String) input.readObject());
+    String data = (String) input.readObject();
+    try {
+      readMessage(data);
+    } catch (Exception e) {
+      System.out.println("> Erro: Não foi possível ler a mensagem");
+    }
+  }
+
+  private void readMessage(String data) throws Exception {
+    data = data.replace('(', ' ');
+    data = data.replace(')', ' ');
+
+    String[] dataSplited = data.split(" ");
+    String type = dataSplited[0];
+    String[] contentSplited = dataSplited[1].split(",");
+    String groupId = contentSplited[0];
+    String user = contentSplited[1];
+
+    switch (type) {
+      case "send":
+        String message = contentSplited[2];
+        System.out.println("> " + user + " diz: " + message + " para " + groupId);
+        break;
+      default:
+        System.out.println("> Tipo de mensagem inválida");
+        break;
+    }
   }
 
 }

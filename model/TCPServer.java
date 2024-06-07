@@ -50,15 +50,17 @@ public class TCPServer extends Server {
     ObjectOutputStream outputStream = null;
     try {
       input = new ObjectInputStream(clientSocket.getInputStream());
-      String data = (String) input.readObject();
       outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
       clientOutputStreams.add(outputStream);
-      try {
-        readMessage(data);
-      } catch (Exception e) {
-        System.out.println("> Erro: Não foi possível ler a mensagem");
+      while (true) {
+        try {
+          String data = (String) input.readObject();
+          readMessage(data);
+        } catch (Exception e) {
+          System.out.println("> Erro: Classe não encontrada ao ler mensagem");
+        }
       }
-    } catch (IOException | ClassNotFoundException e) {
+    } catch (IOException e) {
       System.out.println("> Erro ao lidar com o cliente: " + e.getMessage());
     } finally {
       // Fecha os fluxos de entrada e saída

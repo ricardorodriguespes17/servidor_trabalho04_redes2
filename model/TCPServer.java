@@ -52,20 +52,16 @@ public class TCPServer extends Server {
   }
 
   private void readMessage(String data) throws Exception {
-    data = data.replace('(', ' ');
-    data = data.replace(')', ' ');
-
-    String[] dataSplited = data.split(" ");
+    String[] dataSplited = data.split("/");
     String type = dataSplited[0];
-    String[] contentSplited = dataSplited[1].split(",");
-    String groupId = contentSplited[0];
-    String user = contentSplited[1];
+    String groupId = dataSplited[1];
+    String user = dataSplited[2];
 
     switch (type) {
       case "send":
         String message = "";
-        for (int i = 2; i < contentSplited.length; i++) {
-          message += contentSplited[i] + " ";
+        for (int i = 3; i < dataSplited.length; i++) {
+          message += dataSplited[i] + " ";
         }
         message = message.trim();
         System.out.println("> " + user + " diz: '" + message + "' para " + groupId);

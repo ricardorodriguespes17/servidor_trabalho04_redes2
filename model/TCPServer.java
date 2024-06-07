@@ -54,6 +54,10 @@ public class TCPServer extends Server {
       readMessage(data);
     } catch (Exception e) {
       System.out.println("> Erro: Não foi possível ler a mensagem");
+    } finally {
+      outputStream.close();
+      input.close();
+      clientOutputStreams.remove(outputStream);
     }
   }
 

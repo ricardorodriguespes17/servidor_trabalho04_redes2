@@ -63,7 +63,11 @@ public class TCPServer extends Server {
 
     switch (type) {
       case "send":
-        String message = contentSplited[2];
+        String message = "";
+        for (int i = 2; i < contentSplited.length; i++) {
+          message += contentSplited[i] + " ";
+        }
+        message = message.trim();
         System.out.println("> " + user + " diz: '" + message + "' para " + groupId);
         break;
       default:

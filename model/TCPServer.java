@@ -126,6 +126,9 @@ public class TCPServer extends Server {
         } else {
           System.out.println("> " + user + " entrou no grupo " + chatId);
 
+          Chat newChat = new Chat(chatId, "Grupo", null);
+          this.getApp().getChatController().createChat(newChat);
+
           ChatUser chatUser = new ChatUser(user, chatId);
           this.getApp().getChatUserController().createChatUser(chatUser);
 
@@ -144,6 +147,7 @@ public class TCPServer extends Server {
         }
         break;
       default:
+        error = "error/Tipo de mensagem inválida";
         sendDataToAllClients(sender, error);
         return;
     }
@@ -151,9 +155,6 @@ public class TCPServer extends Server {
     if (message != null) {
       String responseData = createDataResponse(message);
       sendDataToAllClients(sender, responseData);
-    } else {
-      error = "error/Tipo de mensagem inválida";
-      sendDataToAllClients(sender, error);
     }
   }
 

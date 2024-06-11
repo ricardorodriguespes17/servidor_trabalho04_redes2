@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class TCPServer extends Server {
       while (true) {
         try {
           String data = (String) input.readObject();
-          readMessage(outputStream, data);
+          readData(outputStream, data);
         } catch (Exception e) {
           System.out.println("> Erro: Classe não encontrada ao ler mensagem");
           break;
@@ -84,33 +85,41 @@ public class TCPServer extends Server {
     }
   }
 
-  private void readMessage(ObjectOutputStream sender, String data) throws Exception {
+  private void readData(ObjectOutputStream sender, String data) throws Exception {
     String[] dataSplited = data.split("/");
     String type = dataSplited[0];
-    String groupId = dataSplited[1];
+    String chatId = dataSplited[1];
     String user = dataSplited[2];
+    String error = "";
 
     switch (type) {
       case "send":
-        String message = "";
+        String messageText = "";
         for (int i = 3; i < dataSplited.length; i++) {
-          message += dataSplited[i] + " ";
+          messageText += dataSplited[i] + " ";
         }
-        message = message.trim();
+        messageText = messageText.trim();
 
-        String completedMessage = "> " + user + " diz: '" + message + "' para " + groupId;
-        System.out.println(completedMessage);
-        sendMessageToAllClients(sender, completedMessage);
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        Message message = new Message(chatId, user, messageText, localDateTime);
+        this.getApp().getMessageController().createMessage(message);
+        break;
+      case "join":
+        break;
+      case "leave":
         break;
       default:
-        System.out.println("> Tipo de mensagem inválida");
-        break;
+        error = "error/Tipo de mensagem inválida";
+        sendDataToAllClients(sender, error);
+        return;
     }
 
+    sendDataToAllClients(sender, data);
   }
 
   @Override
-  public void sendMessageToAllClients(ObjectOutputStream sender, String message) {
+  public void sendDataToAllClients(ObjectOutputStream sender, String message) {
     for (ObjectOutputStream outputStream : clientOutputStreams) {
       if (!outputStream.equals(sender)) {
         try {

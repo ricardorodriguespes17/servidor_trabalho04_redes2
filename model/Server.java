@@ -4,9 +4,11 @@ import java.io.ObjectOutputStream;
 
 public abstract class Server {
   protected int port;
+  private App app;
 
   public Server(int port) {
     this.port = port;
+    app = App.getInstance();
   }
 
   public static Server createServer(String type, int port) {
@@ -20,7 +22,7 @@ public abstract class Server {
 
   public abstract void start();
 
-  public abstract void sendMessageToAllClients(ObjectOutputStream sender, String message);
+  public abstract void sendDataToAllClients(ObjectOutputStream sender, String message);
 
   public abstract void stop();
 
@@ -30,5 +32,13 @@ public abstract class Server {
 
   public void setPort(int port) {
     this.port = port;
+  }
+
+  public App getApp() {
+    return app;
+  }
+
+  public void setApp(App app) {
+    this.app = app;
   }
 }

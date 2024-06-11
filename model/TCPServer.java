@@ -34,7 +34,7 @@ public class TCPServer extends Server {
 
       while (true) {
         Socket clientSocket = serverSocket.accept();
-        System.out.println("Cliente " + clientSocket.getLocalAddress().getHostAddress() + " conectado.");
+        System.out.println("> Cliente " + clientSocket.getInetAddress().getHostAddress() + " conectado.");
         new Thread(() -> {
           handleClient(clientSocket);
         }).start();
@@ -69,7 +69,7 @@ public class TCPServer extends Server {
           readData(outputStream, data);
         } catch (Exception e) {
 
-          System.out.println("> Cliente " + clientSocket.getLocalAddress().getHostAddress() + " desconectado.");
+          System.out.println("> Cliente " + clientSocket.getInetAddress().getHostAddress() + " desconectado.");
           break;
         }
       }
@@ -117,21 +117,21 @@ public class TCPServer extends Server {
 
         Message message = new Message(chatId, user, messageText, localDateTime);
         this.getApp().getMessageController().createMessage(message);
-        System.out.println(user + " enviou '" + messageText + "' para " + chatId);
+        System.out.println("> " + user + " enviou '" + messageText + "' para " + chatId);
         break;
       case "join":
         if (chat == null) {
-          System.out.println(user + " criou o grupo " + chatId);
+          System.out.println("> " + user + " criou o grupo " + chatId);
           this.getApp().getChatController().createChat(new Chat(chatId, "Redes", null));
         } else {
-          System.out.println(user + " Entrou no grupo " + chatId);
+          System.out.println("> " + user + " Entrou no grupo " + chatId);
           ChatUser chatUser = new ChatUser(user, chatId);
           this.getApp().getChatUserController().createChatUser(chatUser);
         }
         break;
       case "leave":
         if (chat != null) {
-          System.out.println(user + " saiu do grupo " + chatId);
+          System.out.println("> " + user + " saiu do grupo " + chatId);
           this.getApp().getChatUserController().deleteChatUser(chatId, user);
         }
         break;

@@ -53,4 +53,16 @@ public class ChatUserRepository {
 
     return result;
   }
+
+  public void deleteChatUser(String chatId, String userIp) {
+    List<ChatUser> newChatUsers = new ArrayList<>(chatUsers);
+
+    for (ChatUser chatUser : newChatUsers) {
+      boolean sameChatId = chatUser.getChatId().equals(chatId);
+      boolean sameUserIp = chatUser.getUserIp().equals(userIp);
+      if (sameChatId && sameUserIp) {
+        chatUsers.remove(chatUser);
+      }
+    }
+  }
 }

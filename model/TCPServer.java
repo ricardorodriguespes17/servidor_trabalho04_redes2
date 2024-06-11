@@ -92,6 +92,8 @@ public class TCPServer extends Server {
     String user = dataSplited[2];
     String error = "";
 
+    Chat chat = this.getApp().getChatController().getChatById(chatId);
+
     switch (type) {
       case "send":
         String messageText = "";
@@ -106,8 +108,17 @@ public class TCPServer extends Server {
         this.getApp().getMessageController().createMessage(message);
         break;
       case "join":
+        if (chat == null) {
+          this.getApp().getChatController().createChat(new Chat(chatId, "Redes", null));
+        } else {
+          ChatUser chatUser = new ChatUser(user, chatId);
+          this.getApp().getChatUserController().createChatUser(chatUser);
+        }
         break;
       case "leave":
+        if (chat != null) {
+          this.getApp().getChatUserController().deleteChatUser(chatId, user);
+        }
         break;
       default:
         error = "error/Tipo de mensagem inválida";

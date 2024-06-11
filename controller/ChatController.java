@@ -2,17 +2,21 @@ package controller;
 
 import java.util.List;
 
-import dao.ChatUserRepository;
-import model.ChatUser;
+import dao.ChatRepository;
+import model.Chat;
 
 public class ChatController {
-  private ChatUserRepository chatUserRepository = new ChatUserRepository();
+  private ChatRepository chatRepository = new ChatRepository();
 
-  public void createChat(ChatUser chatUser) {
-    chatUserRepository.createChatUser(chatUser);
+  public void createChat(Chat chatUser) {
+    chatRepository.createChat(chatUser);
   }
 
-  public List<ChatUser> getAllChats() {
-    return chatUserRepository.getAllChatUsers();
+  public List<Chat> getAllChats() {
+    return chatRepository.getAllChats();
+  }
+
+  public Chat getChatById(String chatId) {
+    return chatRepository.getChatById(chatId);
   }
 }

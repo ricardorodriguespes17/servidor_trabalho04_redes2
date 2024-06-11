@@ -27,4 +27,8 @@ public class ChatUserController {
   public ChatUser getChatUserByIds(String chatId, String userIp) {
     return chatUserRepository.getChatUserByIds(chatId, userIp);
   }
+
+  public void deleteChatUser(String chatId, String userIp) {
+    chatUserRepository.deleteChatUser(chatId, userIp);
+  }
 }

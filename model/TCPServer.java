@@ -68,7 +68,8 @@ public class TCPServer extends Server {
           String data = (String) input.readObject();
           readData(outputStream, data);
         } catch (Exception e) {
-          System.out.println("> Erro: Classe não encontrada ao ler mensagem");
+
+          System.out.println("> Cliente " + clientSocket.getLocalAddress().getHostAddress() + " desconectado.");
           break;
         }
       }

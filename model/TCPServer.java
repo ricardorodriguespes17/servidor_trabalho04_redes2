@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TCPServer extends Server {
-  private List<ObjectOutputStream> clientOutputStreams = new ArrayList<>();
+  private List<Socket> connectedClients = new ArrayList<>();
   private ServerSocket serverSocket;
 
   public TCPServer(int port) {
@@ -41,6 +41,7 @@ public class TCPServer extends Server {
         }).start();
       }
     } catch (IOException e) {
+      connectedClients.clear();
       e.printStackTrace();
     }
   }
@@ -63,14 +64,14 @@ public class TCPServer extends Server {
     try {
       input = new ObjectInputStream(clientSocket.getInputStream());
       outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-      clientOutputStreams.add(outputStream);
+      connectedClients.add(clientSocket);
       while (true) {
         try {
           String data = (String) input.readObject();
-          System.out.println("> Client " + clientSocket.getInetAddress().getHostAddress() + " enviou: " + data);
-          readData(outputStream, data);
+          System.out.println("> Cliente " + clientSocket.getInetAddress().getHostAddress() + " enviou: " + data);
+          readData(clientSocket, data);
         } catch (Exception e) {
-
+          connectedClients.remove(clientSocket);
           System.out.println("> Cliente " + clientSocket.getInetAddress().getHostAddress() + " desconectado.");
           break;
         }
@@ -94,11 +95,11 @@ public class TCPServer extends Server {
         }
       }
       // Remove o fluxo de saída associado ao cliente desconectado da lista
-      clientOutputStreams.remove(outputStream);
+      connectedClients.remove(clientSocket);
     }
   }
 
-  private void readData(ObjectOutputStream sender, String data) throws Exception {
+  private void readData(Socket clientSocket, String data) throws Exception {
     String[] dataSplited = data.split("/");
     String type = dataSplited[0];
     String chatId = dataSplited[1];
@@ -149,30 +150,31 @@ public class TCPServer extends Server {
         break;
       default:
         error = "error/Tipo de mensagem inválida";
-        sendDataToAllClients(sender, error);
+        sendDataToAllClients(clientSocket, error);
         return;
     }
 
     if (message != null) {
       String responseData = createDataResponse(message);
-      sendDataToAllClients(sender, responseData);
+      sendDataToAllClients(clientSocket, responseData);
     }
   }
 
   private String createDataResponse(Message message) {
-    // send/{chatId}/{messageText}
+    // send/{chatId}/{userIp}/{messageText}
     String response = "send/" + message.getChatId() + "/" + message.getUserIp() + "/" + message.getText();
 
     return response;
   }
 
   @Override
-  public void sendDataToAllClients(ObjectOutputStream sender, String message) {
-    for (ObjectOutputStream outputStream : clientOutputStreams) {
-      if (!outputStream.equals(sender)) {
+  public void sendDataToAllClients(Socket sender, String message) {
+    for (Socket socket : connectedClients) {
+      if (!socket.equals(sender)) {
         try {
-          outputStream.writeObject(message);
-          outputStream.flush();
+          ObjectOutputStream clientOutputStream = new ObjectOutputStream(socket.getOutputStream());
+          clientOutputStream.writeObject(message);
+          clientOutputStream.flush();
         } catch (IOException e) {
           e.printStackTrace();
         }

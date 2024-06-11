@@ -9,7 +9,7 @@
 
 package model;
 
-import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 public abstract class Server {
   protected int port;
@@ -31,7 +31,7 @@ public abstract class Server {
 
   public abstract void start();
 
-  public abstract void sendDataToAllClients(ObjectOutputStream sender, String message);
+  public abstract void sendDataToAllClients(Socket sender, String message);
 
   public abstract void stop();
 

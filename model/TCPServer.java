@@ -30,6 +30,7 @@ public class TCPServer extends Server {
   public void start() {
     try {
       serverSocket = new ServerSocket(port);
+      App.SERVER_IP = serverSocket.getInetAddress().getHostAddress();
       System.out.println("> TCP Server está rodando na porta " + port);
 
       while (true) {
@@ -132,7 +133,7 @@ public class TCPServer extends Server {
           ChatUser chatUser = new ChatUser(user, chatId);
           this.getApp().getChatUserController().createChatUser(chatUser);
 
-          message = new Message(chatId, "server", user + " entrou no grupo", localDateTime);
+          message = new Message(chatId, App.SERVER_IP, user + " entrou no grupo", localDateTime);
           this.getApp().getMessageController().createMessage(message);
         }
         break;
@@ -142,7 +143,7 @@ public class TCPServer extends Server {
 
           this.getApp().getChatUserController().deleteChatUser(chatId, user);
 
-          message = new Message(chatId, "server", user + " saiu do grupo", localDateTime);
+          message = new Message(chatId, App.SERVER_IP, user + " saiu do grupo", localDateTime);
           this.getApp().getMessageController().createMessage(message);
         }
         break;

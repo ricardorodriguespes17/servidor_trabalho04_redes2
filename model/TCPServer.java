@@ -34,6 +34,7 @@ public class TCPServer extends Server {
 
       while (true) {
         Socket clientSocket = serverSocket.accept();
+        System.out.println("Cliente " + clientSocket.getLocalAddress().getHostAddress() + " conectado.");
         new Thread(() -> {
           handleClient(clientSocket);
         }).start();

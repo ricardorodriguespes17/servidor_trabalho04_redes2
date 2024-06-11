@@ -1,3 +1,12 @@
+/* ***************************************************************
+* Autor............: Ricardo Rodrigues Neto
+* Matricula........: 201710560
+* Inicio...........: 10/06/2024
+* Ultima alteracao.: 11/06/2024
+* Nome.............: Chat
+* Funcao...........: Classe do objeto Chat/Grupo.
+*************************************************************** */
+
 package model;
 
 public class Chat {

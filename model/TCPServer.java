@@ -1,3 +1,12 @@
+/* ***************************************************************
+* Autor............: Ricardo Rodrigues Neto
+* Matricula........: 201710560
+* Inicio...........: 07/06/2024
+* Ultima alteracao.: 11/06/2024
+* Nome.............: TCP Server
+* Funcao...........: Classe do Servidor TCP.
+*************************************************************** */
+
 package model;
 
 import java.io.IOException;

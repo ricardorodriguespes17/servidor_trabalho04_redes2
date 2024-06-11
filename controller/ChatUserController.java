@@ -1,3 +1,12 @@
+/* ***************************************************************
+* Autor............: Ricardo Rodrigues Neto
+* Matricula........: 201710560
+* Inicio...........: 10/06/2024
+* Ultima alteracao.: 11/06/2024
+* Nome.............: ChatUserController
+* Funcao...........: Classe controladora do CRUD do ChatUser.
+*************************************************************** */
+
 package controller;
 
 import java.util.List;

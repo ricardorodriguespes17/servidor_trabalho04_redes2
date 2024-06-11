@@ -160,7 +160,7 @@ public class TCPServer extends Server {
 
   private String createDataResponse(Message message) {
     // send/{chatId}/{messageText}
-    String response = "send/" + message.getChatId() + "/" + message.getText();
+    String response = "send/" + message.getChatId() + "/" + message.getUserIp() + "/" + message.getText();
 
     return response;
   }

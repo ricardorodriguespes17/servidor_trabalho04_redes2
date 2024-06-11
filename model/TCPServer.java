@@ -66,6 +66,7 @@ public class TCPServer extends Server {
       while (true) {
         try {
           String data = (String) input.readObject();
+          System.out.println("> Client " + clientSocket.getInetAddress().getHostAddress() + " enviou: " + data);
           readData(outputStream, data);
         } catch (Exception e) {
 
@@ -104,6 +105,8 @@ public class TCPServer extends Server {
     String error = "";
 
     Chat chat = this.getApp().getChatController().getChatById(chatId);
+    Message message = null;
+    LocalDateTime localDateTime = LocalDateTime.now();
 
     switch (type) {
       case "send":
@@ -112,10 +115,7 @@ public class TCPServer extends Server {
           messageText += dataSplited[i] + " ";
         }
         messageText = messageText.trim();
-
-        LocalDateTime localDateTime = LocalDateTime.now();
-
-        Message message = new Message(chatId, user, messageText, localDateTime);
+        message = new Message(chatId, user, messageText, localDateTime);
         this.getApp().getMessageController().createMessage(message);
         System.out.println("> " + user + " enviou '" + messageText + "' para " + chatId);
         break;
@@ -124,24 +124,44 @@ public class TCPServer extends Server {
           System.out.println("> " + user + " criou o grupo " + chatId);
           this.getApp().getChatController().createChat(new Chat(chatId, "Redes", null));
         } else {
-          System.out.println("> " + user + " Entrou no grupo " + chatId);
+          System.out.println("> " + user + " entrou no grupo " + chatId);
+
           ChatUser chatUser = new ChatUser(user, chatId);
           this.getApp().getChatUserController().createChatUser(chatUser);
+
+          message = new Message(chatId, "server", user + " entrou no grupo", localDateTime);
+          this.getApp().getMessageController().createMessage(message);
         }
         break;
       case "leave":
         if (chat != null) {
           System.out.println("> " + user + " saiu do grupo " + chatId);
+
           this.getApp().getChatUserController().deleteChatUser(chatId, user);
+
+          message = new Message(chatId, "server", user + " saiu do grupo", localDateTime);
+          this.getApp().getMessageController().createMessage(message);
         }
         break;
       default:
-        error = "error/Tipo de mensagem inválida";
         sendDataToAllClients(sender, error);
         return;
     }
 
-    sendDataToAllClients(sender, data);
+    if (message != null) {
+      String responseData = createDataResponse(message);
+      sendDataToAllClients(sender, responseData);
+    } else {
+      error = "error/Tipo de mensagem inválida";
+      sendDataToAllClients(sender, error);
+    }
+  }
+
+  private String createDataResponse(Message message) {
+    // send/{chatId}/{messageText}
+    String response = "send/" + message.getChatId() + "/" + message.getText();
+
+    return response;
   }
 
   @Override

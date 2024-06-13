@@ -87,7 +87,7 @@ public class DataManager {
 
     System.out.println("> " + userIp + " saiu do grupo " + chatId);
 
-    String response = returnSend(chatId, userIp, message.getText());
+    String response = returnSend(chatId, serverIp, message.getText());
     server.sendDataToGroupClients(chatId, userIp, response);
   }
 }

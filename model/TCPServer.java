@@ -2,7 +2,7 @@
 * Autor............: Ricardo Rodrigues Neto
 * Matricula........: 201710560
 * Inicio...........: 07/06/2024
-* Ultima alteracao.: 11/06/2024
+* Ultima alteracao.: 13/06/2024
 * Nome.............: TCP Server
 * Funcao...........: Classe do Servidor TCP.
 *************************************************************** */
@@ -10,8 +10,6 @@
 package model;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDateTime;
@@ -21,23 +19,28 @@ import java.util.List;
 public class TCPServer extends Server {
   private List<Socket> connectedClients = new ArrayList<>();
   private ServerSocket serverSocket;
+  private App app;
 
   public TCPServer(int port) {
     super(port);
+    app = App.getInstance();
   }
 
   @Override
   public void start() {
     try {
       serverSocket = new ServerSocket(port);
-      App.SERVER_IP = serverSocket.getInetAddress().getHostAddress();
       System.out.println("> TCP Server está rodando na porta " + port);
 
       while (true) {
         Socket clientSocket = serverSocket.accept();
         System.out.println("> Cliente " + clientSocket.getInetAddress().getHostAddress() + " conectado.");
         new Thread(() -> {
-          handleClient(clientSocket);
+          try {
+            handleClient(clientSocket);
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
         }).start();
       }
     } catch (IOException e) {
@@ -58,48 +61,32 @@ public class TCPServer extends Server {
     }
   }
 
-  private void handleClient(Socket clientSocket) {
-    ObjectInputStream input = null;
-    ObjectOutputStream outputStream = null;
-    try {
-      input = new ObjectInputStream(clientSocket.getInputStream());
-      outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-      connectedClients.add(clientSocket);
-      while (true) {
-        try {
-          String data = (String) input.readObject();
-          System.out.println("> Cliente " + clientSocket.getInetAddress().getHostAddress() + " enviou: " + data);
-          readData(clientSocket, data);
-        } catch (Exception e) {
-          connectedClients.remove(clientSocket);
-          System.out.println("> Cliente " + clientSocket.getInetAddress().getHostAddress() + " desconectado.");
-          break;
-        }
+  private void handleClient(Socket clientSocket) throws IOException {
+    Client client = new Client(clientSocket);
+    app.getClientController().createClient(client);
+    
+    while (true) {
+      String data = "";
+      try {
+        data = (String) client.getInputStream().readObject();
+        System.out.println("> Cliente " + client.getIp() + " enviou: " + data);
+      } catch (Exception e) {
+        break;
       }
-    } catch (IOException e) {
-      System.out.println("> Erro ao lidar com o cliente: " + e.getMessage());
-    } finally {
-      // Fecha os fluxos de entrada e saída
-      if (input != null) {
-        try {
-          input.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
+
+      String response = readData(client.getServerIp(), data);
+
+      if(response != null) {
+        sendDataToAllClients(client.getIp(), response);
       }
-      if (outputStream != null) {
-        try {
-          outputStream.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
-      // Remove o fluxo de saída associado ao cliente desconectado da lista
-      connectedClients.remove(clientSocket);
     }
+
+    System.out.println("> Cliente " + client.getIp() + " desconectado.");
+    client.close();
+    connectedClients.remove(clientSocket);
   }
 
-  private void readData(Socket clientSocket, String data) throws Exception {
+  private String readData(String serverIp, String data) {
     String[] dataSplited = data.split("/");
     String type = dataSplited[0];
     String chatId = dataSplited[1];
@@ -134,7 +121,7 @@ public class TCPServer extends Server {
           ChatUser chatUser = new ChatUser(user, chatId);
           this.getApp().getChatUserController().createChatUser(chatUser);
 
-          message = new Message(chatId, App.SERVER_IP, user + " entrou no grupo", localDateTime);
+          message = new Message(chatId, serverIp, user + " entrou no grupo", localDateTime);
           this.getApp().getMessageController().createMessage(message);
         }
         break;
@@ -144,20 +131,21 @@ public class TCPServer extends Server {
 
           this.getApp().getChatUserController().deleteChatUser(chatId, user);
 
-          message = new Message(chatId, App.SERVER_IP, user + " saiu do grupo", localDateTime);
+          message = new Message(chatId, serverIp, user + " saiu do grupo", localDateTime);
           this.getApp().getMessageController().createMessage(message);
         }
         break;
       default:
         error = "error/Tipo de mensagem inválida";
-        sendDataToAllClients(clientSocket, error);
-        return;
+        return error;
     }
 
     if (message != null) {
       String responseData = createDataResponse(message);
-      sendDataToAllClients(clientSocket, responseData);
+      return responseData;
     }
+
+    return null;
   }
 
   private String createDataResponse(Message message) {
@@ -168,13 +156,15 @@ public class TCPServer extends Server {
   }
 
   @Override
-  public void sendDataToAllClients(Socket sender, String message) {
-    for (Socket socket : connectedClients) {
-      if (!socket.equals(sender)) {
+  public void sendDataToAllClients(String clientIp, String data) {
+    List<Client> clients = app.getClientController().getAllClients();
+
+    for (Client client : clients) {
+      if (!client.getIp().equals(clientIp) && client.getSocket().isConnected()) {
+        System.out.println("> (" + data + ") para " + client.getIp());
         try {
-          ObjectOutputStream clientOutputStream = new ObjectOutputStream(socket.getOutputStream());
-          clientOutputStream.writeObject(message);
-          clientOutputStream.flush();
+          client.getOutputStream().writeObject(data);
+          client.getOutputStream().flush();
         } catch (IOException e) {
           e.printStackTrace();
         }

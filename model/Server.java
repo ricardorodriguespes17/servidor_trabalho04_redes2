@@ -2,14 +2,12 @@
 * Autor............: Ricardo Rodrigues Neto
 * Matricula........: 201710560
 * Inicio...........: 07/06/2024
-* Ultima alteracao.: 11/06/2024
+* Ultima alteracao.: 13/06/2024
 * Nome.............: Server
 * Funcao...........: Classe abstrata do Servidor.
 *************************************************************** */
 
 package model;
-
-import java.net.Socket;
 
 public abstract class Server {
   protected int port;
@@ -31,7 +29,7 @@ public abstract class Server {
 
   public abstract void start();
 
-  public abstract void sendDataToAllClients(Socket sender, String message);
+  public abstract void sendDataToAllClients(String clientIp, String message);
 
   public abstract void stop();
 

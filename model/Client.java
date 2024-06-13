@@ -1,0 +1,75 @@
+package model;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
+public class Client {
+  private String ip;
+  private String serverIp;
+  private Socket socket;
+  private ObjectOutputStream outputStream;
+  private ObjectInputStream inputStream;
+
+  public Client(Socket socket) throws IOException {
+    this.socket = socket;
+    this.ip = socket.getInetAddress().getHostAddress();
+    this.serverIp = socket.getLocalAddress().getHostAddress();
+    this.outputStream = new ObjectOutputStream(socket.getOutputStream());
+    this.inputStream = new ObjectInputStream(socket.getInputStream());
+  }
+
+  public void close() {
+    try {
+      if (outputStream != null)
+        outputStream.close();
+
+      if (inputStream != null)
+        inputStream.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public Socket getSocket() {
+    return socket;
+  }
+
+  public void setSocket(Socket socket) {
+    this.socket = socket;
+  }
+
+  public ObjectOutputStream getOutputStream() {
+    return outputStream;
+  }
+
+  public void setOutputStream(ObjectOutputStream outputStream) {
+    this.outputStream = outputStream;
+  }
+
+  public ObjectInputStream getInputStream() {
+    return inputStream;
+  }
+
+  public void setInputStream(ObjectInputStream inputStream) {
+    this.inputStream = inputStream;
+  }
+
+  public String getIp() {
+    return ip;
+  }
+
+  public void setIp(String ip) {
+    this.ip = ip;
+  }
+
+  public String getServerIp() {
+    return serverIp;
+  }
+
+  public void setServerIp(String serverIp) {
+    this.serverIp = serverIp;
+  }
+
+}

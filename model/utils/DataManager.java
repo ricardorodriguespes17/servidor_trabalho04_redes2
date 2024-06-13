@@ -33,7 +33,7 @@ public class DataManager {
     server.sendDataToGroupClients(chatId, userIp, response);
   }
 
-  public static void join(Server server, String chatId, String userIp) {
+  public static void join(Server server, String serverIp, String chatId, String userIp) {
     Chat chat = app.getChatController().getChatById(chatId);
 
     if (chat == null) {
@@ -45,12 +45,12 @@ public class DataManager {
     ChatUser chatUser = new ChatUser(userIp, chatId);
     app.getChatUserController().createChatUser(chatUser);
 
-    Message message = new Message(chatId, App.SERVER_IP, userIp + " entrou no grupo", LocalDateTime.now());
+    Message message = new Message(chatId, serverIp, userIp + " entrou no grupo", LocalDateTime.now());
     app.getMessageController().createMessage(message);
 
     System.out.println("> " + userIp + " entrou no grupo " + chatId);
 
-    String membersResponse = returnSend(chatId, App.SERVER_IP, message.getText());
+    String membersResponse = returnSend(chatId, serverIp, message.getText());
     server.sendDataToGroupClients(chatId, userIp, membersResponse);
 
     String userResponse = returnChat(chatId, chat.getName());
@@ -71,7 +71,7 @@ public class DataManager {
     System.out.println("> " + userIp + " criou o grupo " + chatId + " vulgo " + chatName);
   }
 
-  public static void leave(Server server, String chatId, String userIp) {
+  public static void leave(Server server, String serverIp, String chatId, String userIp) {
     Chat chat = app.getChatController().getChatById(chatId);
 
     if (chat == null) {
@@ -82,7 +82,7 @@ public class DataManager {
 
     app.getChatUserController().deleteChatUser(chatId, userIp);
 
-    Message message = new Message(chatId, App.SERVER_IP, userIp + " saiu do grupo", LocalDateTime.now());
+    Message message = new Message(chatId, serverIp, userIp + " saiu do grupo", LocalDateTime.now());
     app.getMessageController().createMessage(message);
 
     System.out.println("> " + userIp + " saiu do grupo " + chatId);

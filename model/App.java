@@ -15,7 +15,6 @@ import controller.ClientController;
 import controller.MessageController;
 
 public class App {
-  public static String SERVER_IP;
   private static App instance;
   private ClientController clientController = new ClientController();
   private ChatController chatController = new ChatController();

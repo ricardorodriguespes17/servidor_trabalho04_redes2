@@ -90,10 +90,10 @@ public class TCPServer extends Server {
         DataManager.send(this, dataSplited[1], dataSplited[2], dataSplited[3]);
         break;
       case "join":
-        DataManager.join(this, dataSplited[1], dataSplited[2]);
+        DataManager.join(this, serverIp, dataSplited[1], dataSplited[2]);
         break;
       case "leave":
-        DataManager.leave(this, dataSplited[1], dataSplited[2]);
+        DataManager.leave(this, serverIp, dataSplited[1], dataSplited[2]);
         break;
       case "create":
         DataManager.create(this, dataSplited[1], dataSplited[2], dataSplited[3]);

@@ -11,8 +11,8 @@ import model.Server;
 public class DataManager {
   private static App app = App.getInstance();
 
-  private static String returnSend(String chatId, String userIp, String message) {
-    return "send/" + chatId + "/" + userIp + "/" + message;
+  private static String returnSend(String chatId, String senderIp, String message) {
+    return "send/" + chatId + "/" + senderIp + "/" + message;
   }
 
   private static String returnChat(String chatId, String chatName) {
@@ -50,7 +50,7 @@ public class DataManager {
 
     System.out.println("> " + userIp + " entrou no grupo " + chatId);
 
-    String membersResponse = returnSend(chatId, userIp, message.getText());
+    String membersResponse = returnSend(chatId, App.SERVER_IP, message.getText());
     server.sendDataToGroupClients(chatId, userIp, membersResponse);
 
     String userResponse = returnChat(chatId, chat.getName());
@@ -60,7 +60,7 @@ public class DataManager {
   public static void create(Server server, String chatId, String chatName, String userIp) {
     Chat chat = app.getChatController().getChatById(chatId);
 
-    if (chat == null) {
+    if (chat != null) {
       String error = returnError("Não foi possível criar o grupo");
       server.sendDataToSingleClient(userIp, error);
       return;

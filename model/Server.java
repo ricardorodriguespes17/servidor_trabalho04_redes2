@@ -51,7 +51,7 @@ public abstract class Server {
     List<Client> clients = getApp().getClientController().getAllClients();
 
     for (Client client : clients) {
-      if (!client.getIp().equals(clientIp)) {
+      if (client.getIp().equals(clientIp)) {
         sendDataToClient(client, data);
         return;
       }

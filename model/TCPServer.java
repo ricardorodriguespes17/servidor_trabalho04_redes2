@@ -62,7 +62,7 @@ public class TCPServer extends Server {
 
   private void handleClient(Socket clientSocket) throws IOException {
     Client client = new Client(clientSocket);
-    this.getApp().getClientController().createClient(client);
+    getApp().getClientController().createClient(client);
 
     while (true) {
       String data = "";
@@ -77,8 +77,8 @@ public class TCPServer extends Server {
     }
 
     System.out.println("> Cliente " + client.getIp() + " desconectado.");
+    getApp().getClientController().removeClient(client.getIp());
     client.close();
-    connectedClients.remove(clientSocket);
   }
 
   private void processData(String serverIp, String data) {

@@ -48,11 +48,12 @@ public abstract class Server {
   }
 
   public void sendDataToSingleClient(String clientIp, String data) {
-    List<Client> clients = this.getApp().getClientController().getAllClients();
+    List<Client> clients = getApp().getClientController().getAllClients();
 
     for (Client client : clients) {
       if (!client.getIp().equals(clientIp)) {
         sendDataToClient(client, data);
+        return;
       }
     }
   }

@@ -6,6 +6,7 @@ import model.App;
 import model.Chat;
 import model.ChatUser;
 import model.Message;
+import model.Server;
 
 public class DataManager {
   private static App app = App.getInstance();
@@ -22,20 +23,23 @@ public class DataManager {
     return "error/" + reason;
   }
 
-  public static String send(String chatId, String userIp, String messageText) {
+  public static void send(Server server, String chatId, String userIp, String messageText) {
     Message message = new Message(chatId, userIp, messageText, LocalDateTime.now());
     app.getMessageController().createMessage(message);
 
     System.out.println("> " + userIp + " enviou '" + messageText + "' para " + chatId);
-    
-    return returnSend(chatId, userIp, message.getText());
+
+    String response = returnSend(chatId, userIp, message.getText());
+    server.sendDataToGroupClients(chatId, userIp, response);
   }
 
-  public static String join(String chatId, String userIp) {
+  public static void join(Server server, String chatId, String userIp) {
     Chat chat = app.getChatController().getChatById(chatId);
 
-    if(chat == null)
-      return returnError("Não há grupo associado a esse código");
+    if (chat == null) {
+      String error = returnError("Não há grupo associado a esse código");
+      server.sendDataToClient(userIp, error);
+    }
 
     ChatUser chatUser = new ChatUser(userIp, chatId);
     app.getChatUserController().createChatUser(chatUser);
@@ -44,28 +48,34 @@ public class DataManager {
     app.getMessageController().createMessage(message);
 
     System.out.println("> " + userIp + " entrou no grupo " + chatId);
-    
-    return returnSend(chatId, userIp, message.getText());
+
+    String membersResponse = returnSend(chatId, userIp, message.getText());
+    server.sendDataToGroupClients(chatId, userIp, membersResponse);
+
+    String userResponse = returnChat(chatId, chat.getName());
+    server.sendDataToClient(userIp, userResponse);
   }
 
-  public static String create(String chatId, String chatName, String userIp) {
+  public static void create(Server server, String chatId, String chatName, String userIp) {
     Chat chat = app.getChatController().getChatById(chatId);
 
-    if(chat != null)
-      return returnError("Não foi possível criar o grupo");
+    if (chat == null) {
+      String error = returnError("Não foi possível criar o grupo");
+      server.sendDataToClient(userIp, error);
+    }
 
     app.getChatController().createChat(new Chat(chatId, chatName, null));
 
     System.out.println("> " + userIp + " criou o grupo " + chatId + " vulgo " + chatName);
-    
-    return returnChat(chatId, chatName);
   }
 
-  public static String leave(String chatId, String userIp) {
+  public static void leave(Server server, String chatId, String userIp) {
     Chat chat = app.getChatController().getChatById(chatId);
 
-    if(chat == null)
-      return returnError("Não há grupo associado a esse código");
+    if (chat == null) {
+      String error = returnError("Não há grupo associado a esse código");
+      server.sendDataToClient(userIp, error);
+    }
 
     app.getChatUserController().deleteChatUser(chatId, userIp);
 
@@ -73,7 +83,8 @@ public class DataManager {
     app.getMessageController().createMessage(message);
 
     System.out.println("> " + userIp + " saiu do grupo " + chatId);
-    
-    return returnSend(chatId, userIp, message.getText());
+
+    String response = returnSend(chatId, userIp, message.getText());
+    server.sendDataToGroupClients(chatId, userIp, response);
   }
 }

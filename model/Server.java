@@ -9,6 +9,8 @@
 
 package model;
 
+import java.util.List;
+
 public abstract class Server {
   protected int port;
   private App app;
@@ -30,6 +32,30 @@ public abstract class Server {
   public abstract void start();
 
   public abstract void stop();
+
+  public abstract void sendDataToClient(Client client, String data);
+
+  public void sendDataToGroupClients(String chatId, String senderIp, String data) {
+    List<Client> clients = this.getApp().getClientController().getAllClients();
+
+    for (Client client : clients) {
+      ChatUser chatUser = this.getApp().getChatUserController().getChatUserByIds(chatId, client.getIp());
+
+      if (chatUser != null && !client.getIp().equals(senderIp)) {
+        sendDataToClient(client, data);
+      }
+    }
+  }
+
+  public void sendDataToClient(String clientIp, String data) {
+    List<Client> clients = this.getApp().getClientController().getAllClients();
+
+    for (Client client : clients) {
+      if (!client.getIp().equals(clientIp)) {
+        sendDataToClient(client, data);
+      }
+    }
+  }
 
   public int getPort() {
     return port;

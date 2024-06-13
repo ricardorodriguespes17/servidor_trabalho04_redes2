@@ -87,16 +87,16 @@ public class TCPServer extends Server {
 
     switch (type) {
       case "send":
-        DataManager.send(dataSplited[1], dataSplited[2], dataSplited[3]);
+        DataManager.send(this, dataSplited[1], dataSplited[2], dataSplited[3]);
         break;
       case "join":
-        DataManager.join(dataSplited[1], dataSplited[2]);
+        DataManager.join(this, dataSplited[1], dataSplited[2]);
         break;
       case "leave":
-        DataManager.leave(dataSplited[1], dataSplited[2]);
+        DataManager.leave(this, dataSplited[1], dataSplited[2]);
         break;
       case "create":
-        DataManager.create(dataSplited[1], dataSplited[2], dataSplited[3]);
+        DataManager.create(this, dataSplited[1], dataSplited[2], dataSplited[3]);
         break;
       default:
         DataManager.returnError("Tipo de entrada inválida");
@@ -104,28 +104,7 @@ public class TCPServer extends Server {
     }
   }
 
-  public void sendDataToGroupClients(String chatId, String senderIp, String data) {
-    List<Client> clients = this.getApp().getClientController().getAllClients();
-
-    for (Client client : clients) {
-      ChatUser chatUser = this.getApp().getChatUserController().getChatUserByIds(chatId, client.getIp());
-
-      if (chatUser != null && !client.getIp().equals(senderIp)) {
-        sendDataToClient(client, data);
-      }
-    }
-  }
-
-  public void sendDataToClient(String clientIp, String data) {
-    List<Client> clients = this.getApp().getClientController().getAllClients();
-
-    for (Client client : clients) {
-      if (!client.getIp().equals(clientIp)) {
-        sendDataToClient(client, data);
-      }
-    }
-  }
-
+  @Override
   public void sendDataToClient(Client client, String data) {
     boolean isConnected = client.getSocket().isConnected();
     boolean isClosed = client.getSocket().isClosed();

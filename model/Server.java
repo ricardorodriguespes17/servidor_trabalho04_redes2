@@ -47,7 +47,7 @@ public abstract class Server {
     }
   }
 
-  public void sendDataToClient(String clientIp, String data) {
+  public void sendDataToSingleClient(String clientIp, String data) {
     List<Client> clients = this.getApp().getClientController().getAllClients();
 
     for (Client client : clients) {

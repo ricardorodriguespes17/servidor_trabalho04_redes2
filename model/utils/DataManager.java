@@ -38,7 +38,7 @@ public class DataManager {
 
     if (chat == null) {
       String error = returnError("Não há grupo associado a esse código");
-      server.sendDataToClient(userIp, error);
+      server.sendDataToSingleClient(userIp, error);
     }
 
     ChatUser chatUser = new ChatUser(userIp, chatId);
@@ -53,7 +53,7 @@ public class DataManager {
     server.sendDataToGroupClients(chatId, userIp, membersResponse);
 
     String userResponse = returnChat(chatId, chat.getName());
-    server.sendDataToClient(userIp, userResponse);
+    server.sendDataToSingleClient(userIp, userResponse);
   }
 
   public static void create(Server server, String chatId, String chatName, String userIp) {
@@ -61,7 +61,7 @@ public class DataManager {
 
     if (chat == null) {
       String error = returnError("Não foi possível criar o grupo");
-      server.sendDataToClient(userIp, error);
+      server.sendDataToSingleClient(userIp, error);
     }
 
     app.getChatController().createChat(new Chat(chatId, chatName, null));
@@ -74,7 +74,7 @@ public class DataManager {
 
     if (chat == null) {
       String error = returnError("Não há grupo associado a esse código");
-      server.sendDataToClient(userIp, error);
+      server.sendDataToSingleClient(userIp, error);
     }
 
     app.getChatUserController().deleteChatUser(chatId, userIp);

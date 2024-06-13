@@ -110,14 +110,15 @@ public class TCPServer extends Server {
     boolean isClosed = client.getSocket().isClosed();
 
     if (isConnected && !isClosed) {
+      System.out.println("> Enviando (" + data + ") para " + client.getIp());
+
       try {
         client.getOutputStream().writeObject(data);
         client.getOutputStream().flush();
       } catch (IOException e) {
+        System.out.println("> Erro ao enviar");
         e.printStackTrace();
       }
-
-      System.out.println("> (" + data + ") para " + client.getIp());
     }
   }
 }

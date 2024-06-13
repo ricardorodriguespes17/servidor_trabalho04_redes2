@@ -12,18 +12,17 @@ package model;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import model.utils.DataManager;
 
 public class TCPServer extends Server {
   private List<Socket> connectedClients = new ArrayList<>();
   private ServerSocket serverSocket;
-  private App app;
 
   public TCPServer(int port) {
     super(port);
-    app = App.getInstance();
   }
 
   @Override
@@ -63,8 +62,8 @@ public class TCPServer extends Server {
 
   private void handleClient(Socket clientSocket) throws IOException {
     Client client = new Client(clientSocket);
-    app.getClientController().createClient(client);
-    
+    this.getApp().getClientController().createClient(client);
+
     while (true) {
       String data = "";
       try {
@@ -74,11 +73,7 @@ public class TCPServer extends Server {
         break;
       }
 
-      String response = readData(client.getServerIp(), data);
-
-      if(response != null) {
-        sendDataToAllClients(client.getIp(), response);
-      }
+      processData(client.getServerIp(), data);
     }
 
     System.out.println("> Cliente " + client.getIp() + " desconectado.");
@@ -86,89 +81,64 @@ public class TCPServer extends Server {
     connectedClients.remove(clientSocket);
   }
 
-  private String readData(String serverIp, String data) {
+  private void processData(String serverIp, String data) {
     String[] dataSplited = data.split("/");
     String type = dataSplited[0];
-    String chatId = dataSplited[1];
-    String user = dataSplited[2];
-    String error = "";
-
-    Chat chat = this.getApp().getChatController().getChatById(chatId);
-    Message message = null;
-    LocalDateTime localDateTime = LocalDateTime.now();
 
     switch (type) {
       case "send":
-        String messageText = "";
-        for (int i = 3; i < dataSplited.length; i++) {
-          messageText += dataSplited[i] + " ";
-        }
-        messageText = messageText.trim();
-        message = new Message(chatId, user, messageText, localDateTime);
-        this.getApp().getMessageController().createMessage(message);
-        System.out.println("> " + user + " enviou '" + messageText + "' para " + chatId);
+        DataManager.send(dataSplited[1], dataSplited[2], dataSplited[3]);
         break;
       case "join":
-        if (chat == null) {
-          System.out.println("> " + user + " criou o grupo " + chatId);
-          this.getApp().getChatController().createChat(new Chat(chatId, "Redes", null));
-        } else {
-          System.out.println("> " + user + " entrou no grupo " + chatId);
-
-          Chat newChat = new Chat(chatId, "Grupo", null);
-          this.getApp().getChatController().createChat(newChat);
-
-          ChatUser chatUser = new ChatUser(user, chatId);
-          this.getApp().getChatUserController().createChatUser(chatUser);
-
-          message = new Message(chatId, serverIp, user + " entrou no grupo", localDateTime);
-          this.getApp().getMessageController().createMessage(message);
-        }
+        DataManager.join(dataSplited[1], dataSplited[2]);
         break;
       case "leave":
-        if (chat != null) {
-          System.out.println("> " + user + " saiu do grupo " + chatId);
-
-          this.getApp().getChatUserController().deleteChatUser(chatId, user);
-
-          message = new Message(chatId, serverIp, user + " saiu do grupo", localDateTime);
-          this.getApp().getMessageController().createMessage(message);
-        }
+        DataManager.leave(dataSplited[1], dataSplited[2]);
+        break;
+      case "create":
+        DataManager.create(dataSplited[1], dataSplited[2], dataSplited[3]);
         break;
       default:
-        error = "error/Tipo de mensagem inválida";
-        return error;
+        DataManager.returnError("Tipo de entrada inválida");
+        break;
     }
-
-    if (message != null) {
-      String responseData = createDataResponse(message);
-      return responseData;
-    }
-
-    return null;
   }
 
-  private String createDataResponse(Message message) {
-    // send/{chatId}/{userIp}/{messageText}
-    String response = "send/" + message.getChatId() + "/" + message.getUserIp() + "/" + message.getText();
-
-    return response;
-  }
-
-  @Override
-  public void sendDataToAllClients(String clientIp, String data) {
-    List<Client> clients = app.getClientController().getAllClients();
+  public void sendDataToGroupClients(String chatId, String senderIp, String data) {
+    List<Client> clients = this.getApp().getClientController().getAllClients();
 
     for (Client client : clients) {
-      if (!client.getIp().equals(clientIp) && client.getSocket().isConnected()) {
-        System.out.println("> (" + data + ") para " + client.getIp());
-        try {
-          client.getOutputStream().writeObject(data);
-          client.getOutputStream().flush();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
+      ChatUser chatUser = this.getApp().getChatUserController().getChatUserByIds(chatId, client.getIp());
+
+      if (chatUser != null && !client.getIp().equals(senderIp)) {
+        sendDataToClient(client, data);
       }
+    }
+  }
+
+  public void sendDataToClient(String clientIp, String data) {
+    List<Client> clients = this.getApp().getClientController().getAllClients();
+
+    for (Client client : clients) {
+      if (!client.getIp().equals(clientIp)) {
+        sendDataToClient(client, data);
+      }
+    }
+  }
+
+  public void sendDataToClient(Client client, String data) {
+    boolean isConnected = client.getSocket().isConnected();
+    boolean isClosed = client.getSocket().isClosed();
+
+    if (isConnected && !isClosed) {
+      try {
+        client.getOutputStream().writeObject(data);
+        client.getOutputStream().flush();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
+      System.out.println("> (" + data + ") para " + client.getIp());
     }
   }
 }

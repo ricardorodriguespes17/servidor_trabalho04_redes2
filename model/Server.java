@@ -29,8 +29,6 @@ public abstract class Server {
 
   public abstract void start();
 
-  public abstract void sendDataToAllClients(String clientIp, String message);
-
   public abstract void stop();
 
   public int getPort() {

@@ -68,6 +68,9 @@ public class DataManager {
 
     app.getChatController().createChat(new Chat(chatId, chatName, null));
 
+    ChatUser chatUser = new ChatUser(userIp, chatId);
+    app.getChatUserController().createChatUser(chatUser);
+
     System.out.println("> " + userIp + " criou o grupo " + chatId + " vulgo " + chatName);
   }
 

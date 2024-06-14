@@ -36,7 +36,7 @@ public class UDPServer extends Server {
         e.printStackTrace();
       }
 
-      System.out.println("> Client conectado com ip: " + clientIp);
+      System.out.println("> Client UDP conectado com ip: " + clientIp);
 
       try {
         handleClient(receivedDatagramPacket);

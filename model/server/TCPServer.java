@@ -7,18 +7,15 @@
 * Funcao...........: Classe do Servidor TCP.
 *************************************************************** */
 
-package model;
+package model.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
-import model.utils.DataManager;
+import model.Client;
 
 public class TCPServer extends Server {
-  private List<Socket> connectedClients = new ArrayList<>();
   private ServerSocket serverSocket;
 
   public TCPServer(int port) {
@@ -43,7 +40,6 @@ public class TCPServer extends Server {
         }).start();
       }
     } catch (IOException e) {
-      connectedClients.clear();
       e.printStackTrace();
     }
   }
@@ -57,50 +53,6 @@ public class TCPServer extends Server {
       }
     } catch (IOException e) {
       e.printStackTrace();
-    }
-  }
-
-  private void handleClient(Socket clientSocket) throws IOException {
-    Client client = new Client(clientSocket);
-    getApp().getClientController().createClient(client);
-
-    while (true) {
-      String data = "";
-      try {
-        data = (String) client.getInputStream().readObject();
-        System.out.println("> Cliente " + client.getIp() + " enviou: " + data);
-      } catch (Exception e) {
-        break;
-      }
-
-      processData(client.getServerIp(), data);
-    }
-
-    System.out.println("> Cliente " + client.getIp() + " desconectado.");
-    getApp().getClientController().removeClient(client.getIp());
-    client.close();
-  }
-
-  private void processData(String serverIp, String data) {
-    String[] dataSplited = data.split("/");
-    String type = dataSplited[0];
-
-    switch (type) {
-      case "send":
-        DataManager.send(this, dataSplited[1], dataSplited[2], dataSplited[3]);
-        break;
-      case "join":
-        DataManager.join(this, serverIp, dataSplited[1], dataSplited[2]);
-        break;
-      case "leave":
-        DataManager.leave(this, serverIp, dataSplited[1], dataSplited[2]);
-        break;
-      case "create":
-        DataManager.create(this, dataSplited[1], dataSplited[2], dataSplited[3]);
-        break;
-      default:
-        DataManager.returnError("Tipo de entrada inválida");
-        break;
     }
   }
 
@@ -120,5 +72,26 @@ public class TCPServer extends Server {
         e.printStackTrace();
       }
     }
+  }
+
+  public void handleClient(Socket clientSocket) throws IOException {
+    Client client = new Client(clientSocket);
+    getApp().getClientController().createClient(client);
+
+    while (true) {
+      String data = "";
+      try {
+        data = (String) client.getInputStream().readObject();
+        System.out.println("> Cliente " + client.getIp() + " enviou: " + data);
+      } catch (Exception e) {
+        break;
+      }
+
+      processData(client.getServerIp(), data);
+    }
+
+    System.out.println("> Cliente " + client.getIp() + " desconectado.");
+    getApp().getClientController().removeClient(client.getIp());
+    client.close();
   }
 }

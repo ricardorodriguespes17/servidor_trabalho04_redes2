@@ -7,9 +7,14 @@
 * Funcao...........: Classe abstrata do Servidor.
 *************************************************************** */
 
-package model;
+package model.server;
 
 import java.util.List;
+
+import model.App;
+import model.ChatUser;
+import model.Client;
+import model.utils.DataManager;
 
 public abstract class Server {
   protected int port;
@@ -23,8 +28,10 @@ public abstract class Server {
   public static Server createServer(String type, int port) {
     if (type.equals("TCP")) {
       return new TCPServer(port);
-    } else {
-      System.out.println("Tipo de servidor inválido");
+    } else if (type.equals("UDP")) {
+      return new UDPServer(port);
+    }  else {
+      System.out.println("> Tipo de servidor inválido");
       return null;
     }
   }
@@ -34,6 +41,29 @@ public abstract class Server {
   public abstract void stop();
 
   public abstract void sendDataToClient(Client client, String data);
+
+  public void processData(String serverIp, String data) {
+    String[] dataSplited = data.split("/");
+    String type = dataSplited[0];
+
+    switch (type) {
+      case "send":
+        DataManager.send(this, dataSplited[1], dataSplited[2], dataSplited[3]);
+        break;
+      case "join":
+        DataManager.join(this, serverIp, dataSplited[1], dataSplited[2]);
+        break;
+      case "leave":
+        DataManager.leave(this, serverIp, dataSplited[1], dataSplited[2]);
+        break;
+      case "create":
+        DataManager.create(this, dataSplited[1], dataSplited[2], dataSplited[3]);
+        break;
+      default:
+        DataManager.returnError("Tipo de entrada inválida");
+        break;
+    }
+  }
 
   public void sendDataToGroupClients(String chatId, String senderIp, String data) {
     List<Client> clients = this.getApp().getClientController().getAllClients();

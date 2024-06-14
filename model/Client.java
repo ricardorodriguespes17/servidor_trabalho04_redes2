@@ -3,11 +3,14 @@ package model;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
 import java.net.Socket;
 
 public class Client {
   private String ip;
   private String serverIp;
+  private DatagramPacket datagramPacket;
+  
   private Socket socket;
   private ObjectOutputStream outputStream;
   private ObjectInputStream inputStream;
@@ -18,6 +21,11 @@ public class Client {
     this.serverIp = socket.getLocalAddress().getHostAddress();
     this.outputStream = new ObjectOutputStream(socket.getOutputStream());
     this.inputStream = new ObjectInputStream(socket.getInputStream());
+  }
+
+  public Client(DatagramPacket datagramPacket) {
+    this.datagramPacket = datagramPacket;
+    this.ip = datagramPacket.getAddress().getHostAddress();
   }
 
   public void close() {
@@ -70,6 +78,14 @@ public class Client {
 
   public void setServerIp(String serverIp) {
     this.serverIp = serverIp;
+  }
+
+  public DatagramPacket getDatagramPacket() {
+    return datagramPacket;
+  }
+
+  public void setDatagramPacket(DatagramPacket datagramPacket) {
+    this.datagramPacket = datagramPacket;
   }
 
 }

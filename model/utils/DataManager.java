@@ -6,7 +6,7 @@ import model.App;
 import model.Chat;
 import model.ChatUser;
 import model.Message;
-import model.Server;
+import model.server.Server;
 
 public class DataManager {
   private static App app = App.getInstance();

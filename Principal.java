@@ -7,12 +7,14 @@
 * Funcao...........: Inicia o servidor.
 *************************************************************** */
 
-import model.Server;
+import model.server.Server;
 
 public class Principal {
   public static void main(String[] args) {
     Server tcpServer = Server.createServer("TCP", 6789);
+    Server udpServer = Server.createServer("UDP", 6790);
 
     new Thread(tcpServer::start).start();
+    new Thread(udpServer::start).start();
   }
 }

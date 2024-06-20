@@ -2,7 +2,7 @@
 * Autor............: Ricardo Rodrigues Neto
 * Matricula........: 201710560
 * Inicio...........: 07/06/2024
-* Ultima alteracao.: 13/06/2024
+* Ultima alteracao.: 20/06/2024
 * Nome.............: TCP Server
 * Funcao...........: Classe do Servidor TCP.
 *************************************************************** */
@@ -82,7 +82,7 @@ public class TCPServer extends Server {
       String data = "";
       try {
         data = (String) client.getInputStream().readObject();
-        System.out.println("> Cliente " + client.getIp() + " enviou: " + data);
+        System.out.println("> Cliente TCP" + client.getIp() + " enviou: " + data);
       } catch (Exception e) {
         break;
       }
@@ -90,7 +90,7 @@ public class TCPServer extends Server {
       processData(client.getServerIp(), data);
     }
 
-    System.out.println("> Cliente " + client.getIp() + " desconectado.");
+    System.out.println("> Cliente TCP" + client.getIp() + " desconectado.");
     getApp().getClientController().removeClient(client.getIp());
     client.close();
   }

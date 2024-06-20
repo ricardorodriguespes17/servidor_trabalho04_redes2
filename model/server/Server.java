@@ -2,7 +2,7 @@
 * Autor............: Ricardo Rodrigues Neto
 * Matricula........: 201710560
 * Inicio...........: 07/06/2024
-* Ultima alteracao.: 13/06/2024
+* Ultima alteracao.: 20/06/2024
 * Nome.............: Server
 * Funcao...........: Classe abstrata do Servidor.
 *************************************************************** */
@@ -56,11 +56,7 @@ public abstract class Server {
       case "leave":
         DataManager.leave(this, serverIp, dataSplited[1], dataSplited[2]);
         break;
-      case "create":
-        DataManager.create(this, dataSplited[1], dataSplited[2], dataSplited[3]);
-        break;
       default:
-        DataManager.returnError("Tipo de entrada inválida");
         break;
     }
   }

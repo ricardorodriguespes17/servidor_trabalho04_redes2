@@ -1,3 +1,12 @@
+/* ***************************************************************
+* Autor............: Ricardo Rodrigues Neto
+* Matricula........: 201710560
+* Inicio...........: 14/06/2024
+* Ultima alteracao.: 20/06/2024
+* Nome.............: UDP Server
+* Funcao...........: Classe do Servidor UDP.
+*************************************************************** */
+
 package model.server;
 
 import java.io.IOException;
@@ -69,14 +78,14 @@ public class UDPServer extends Server {
 
     try {
       data = new String(clientDatagramPacket.getData());
-      System.out.println("> Cliente " + client.getIp() + " enviou: " + data);
+      System.out.println("> Cliente UDP" + client.getIp() + " enviou: " + data);
     } catch (Exception e) {
       e.printStackTrace();
     }
 
     processData(null, data);
 
-    System.out.println("> Cliente " + client.getIp() + " desconectado.");
+    System.out.println("> Cliente UDP " + client.getIp() + " desconectado.");
     getApp().getClientController().removeClient(client.getIp());
     client.close();
   }

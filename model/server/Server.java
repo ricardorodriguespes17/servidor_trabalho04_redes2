@@ -2,7 +2,7 @@
 * Autor............: Ricardo Rodrigues Neto
 * Matricula........: 201710560
 * Inicio...........: 07/06/2024
-* Ultima alteracao.: 20/06/2024
+* Ultima alteracao.: 26/06/2024
 * Nome.............: Server
 * Funcao...........: Classe abstrata do Servidor.
 *************************************************************** */
@@ -61,11 +61,11 @@ public abstract class Server {
     }
   }
 
-  public void sendDataToGroupClients(String chatId, String senderIp, String data) {
+  public void sendDataToGroupClients(String chatName, String senderIp, String data) {
     List<Client> clients = this.getApp().getClientController().getAllClients();
 
     for (Client client : clients) {
-      ChatUser chatUser = this.getApp().getChatUserController().getChatUserByIds(chatId, client.getIp());
+      ChatUser chatUser = this.getApp().getChatUserController().getChatUserByIds(chatName, client.getIp());
 
       if (chatUser != null && !client.getIp().equals(senderIp)) {
         sendDataToClient(client, data);

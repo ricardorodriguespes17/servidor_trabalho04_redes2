@@ -2,7 +2,7 @@
 * Autor............: Ricardo Rodrigues Neto
 * Matricula........: 201710560
 * Inicio...........: 14/06/2024
-* Ultima alteracao.: 20/06/2024
+* Ultima alteracao.: 26/06/2024
 * Nome.............: DataManager
 * Funcao...........: Classe gerencia as apdus do servidor.
 *************************************************************** */
@@ -36,19 +36,15 @@ public class DataManager {
 
   public static void join(Server server, String serverIp, String chatName, String userIp) {
     Chat chat = app.getChatController().getChatById(chatName);
+    ChatUser chatUser = new ChatUser(userIp, chatName);
+    app.getChatUserController().createChatUser(chatUser);
 
     if (chat == null) {
       app.getChatController().createChat(new Chat(chatName));
 
-      ChatUser chatUser = new ChatUser(userIp, chatName);
-      app.getChatUserController().createChatUser(chatUser);
-
       System.out.println("> " + userIp + " criou o grupo " + chatName);
       return;
     }
-
-    ChatUser chatUser = new ChatUser(userIp, chatName);
-    app.getChatUserController().createChatUser(chatUser);
 
     Message message = new Message(chatName, serverIp, userIp + " entrou no grupo", LocalDateTime.now());
     app.getMessageController().createMessage(message);
